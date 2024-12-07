@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}New Invoice - DentFlow Pro{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold text-gray-900">New Invoice</h1>
+        <a href="{{ url_for('invoices.index') }}" class="text-blue-600 hover:text-blue-900">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Invoices
+        </a>
+    </div>
+
+    <div class="mt-6">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+            <form method="POST">
+                <div class="space-y-6">
+                    <div>
+                        <label for="patient_id" class="form-label">Patient</label>
+                        <select name="patient_id" id="patient_id" required class="form-select">
+                            <option value="">Select Patient</option>
+                            {% for patient in patients %}
+                            <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                        <div>
+                            <label for="date" class="form-label">Invoice Date</label>
+                            <input type="date" name="date" id="date" value="{{ today }}" required class="form-input">
+                        </div>
+
+                        <div>
+                            <label for="due_date" class="form-label">Due Date</label>
+                            <input type="date" name="due_date" id="due_date" value="{{ due_date }}" required class="form-input">
+                        </div>
+                    </div>
+
+                    <div id="items">
+                        <label class="form-label">Items</label>
+                        <div class="space-y-4">
+                            <div class="item-entry grid grid-cols-1 gap-4 sm:grid-cols-4">
+                                <div class="sm:col-span-2">
+                                    <input type="text" name="item_description[]" placeholder="Item Description" required class="form-input">
+                                </div>
+                                <div>
+                                    <input type="number" name="item_quantity[]" placeholder="Quantity" min="1" required class="form-input">
+                                </div>
+                                <div class="relative">
+                                    <input type="number" name="item_price[]" placeholder="Price" min="0" step="0.01" required class="form-input pl-7" onchange="calculateTotal()">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 sm:text-sm">{{ settings.currency_symbol }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="addItem()" class="mt-2 inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-plus mr-2"></i> Add Item
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                        <div>
+                            <label for="tax_rate" class="form-label">Tax Rate (%)</label>
+                            <input type="number" name="tax_rate" id="tax_rate" min="0" max="100" step="0.01" value="0" class="form-input" onchange="calculateTotal()">
+                        </div>
+
+                        <div>
+                            <label for="subtotal" class="form-label">Subtotal</label>
+                            <input type="number" id="subtotal" readonly class="form-input bg-gray-50" value="0.00">
+                        </div>
+
+                        <div>
+                            <label for="tax_amount" class="form-label">Tax Amount</label>
+                            <input type="number" id="tax_amount" readonly class="form-input bg-gray-50" value="0.00">
+                        </div>
+
+                        <div>
+                            <label for="total_amount" class="form-label">Total Amount</label>
+                            <input type="number" id="total_amount" readonly class="form-input bg-gray-50" value="0.00">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea name="notes" id="notes" rows="3" class="form-textarea"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" onclick="window.history.back()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-blue-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Create Invoice
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function calculateTotal() {
+    let subtotal = 0;
+    const items = document.querySelectorAll('.item-entry');
+    
+    items.forEach(item => {
+        const quantity = parseFloat(item.querySelector('input[name="item_quantity[]"]').value) || 0;
+        const price = parseFloat(item.querySelector('input[name="item_price[]"]').value) || 0;
+        subtotal += quantity * price;
+    });
+    
+    const taxRate = parseFloat(document.getElementById('tax_rate').value) || 0;
+    const taxAmount = subtotal * (taxRate / 100);
+    const totalAmount = subtotal + taxAmount;
+    
+    document.getElementById('subtotal').value = subtotal.toFixed(2);
+    document.getElementById('tax_amount').value = taxAmount.toFixed(2);
+    document.getElementById('total_amount').value = totalAmount.toFixed(2);
+}
+
+function addItem() {
+    const container = document.querySelector('#items .space-y-4');
+    const newEntry = document.createElement('div');
+    newEntry.className = 'item-entry grid grid-cols-1 gap-4 sm:grid-cols-4';
+    newEntry.innerHTML = `
+        <div class="sm:col-span-2">
+            <input type="text" name="item_description[]" placeholder="Item Description" required class="form-input">
+        </div>
+        <div>
+            <input type="number" name="item_quantity[]" placeholder="Quantity" min="1" required class="form-input">
+        </div>
+        <div class="relative">
+            <input type="number" name="item_price[]" placeholder="Price" min="0" step="0.01" required class="form-input pl-7" onchange="calculateTotal()">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span class="text-gray-500 sm:text-sm">{{ settings.currency_symbol }}</span>
+            </div>
+            <button type="button" onclick="this.closest('.item-entry').remove(); calculateTotal()" class="ml-2 text-red-600 hover:text-red-900">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(newEntry);
+}
+
+// Initialize total calculation
+document.addEventListener('DOMContentLoaded', calculateTotal);
+</script>
+{% endblock %}

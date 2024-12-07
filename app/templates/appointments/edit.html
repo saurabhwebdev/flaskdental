@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Appointment - DentFlow Pro{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold text-gray-900">Edit Appointment</h1>
+        <a href="{{ url_for('appointments.index') }}" class="text-blue-600 hover:text-blue-900">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Appointments
+        </a>
+    </div>
+
+    <div class="mt-6">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+            <form method="POST">
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                    <div>
+                        <label for="patient_id" class="form-label">Patient</label>
+                        <select name="patient_id" id="patient_id" required class="form-select">
+                            {% for patient in patients %}
+                            <option value="{{ patient.id }}" {% if patient.id == appointment.patient_id %}selected{% endif %}>
+                                {{ patient.first_name }} {{ patient.last_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="appointment_type" class="form-label">Appointment Type</label>
+                        <select name="appointment_type" id="appointment_type" required class="form-select">
+                            <option value="checkup" {% if appointment.treatment_type == 'checkup' %}selected{% endif %}>Check-up</option>
+                            <option value="cleaning" {% if appointment.treatment_type == 'cleaning' %}selected{% endif %}>Cleaning</option>
+                            <option value="filling" {% if appointment.treatment_type == 'filling' %}selected{% endif %}>Filling</option>
+                            <option value="extraction" {% if appointment.treatment_type == 'extraction' %}selected{% endif %}>Extraction</option>
+                            <option value="root_canal" {% if appointment.treatment_type == 'root_canal' %}selected{% endif %}>Root Canal</option>
+                            <option value="other" {% if appointment.treatment_type == 'other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" name="date" id="date" required class="form-input"
+                               value="{{ appointment.date.strftime('%Y-%m-%d') }}">
+                    </div>
+
+                    <div>
+                        <label for="time" class="form-label">Time</label>
+                        <input type="time" name="time" id="time" required class="form-input"
+                               value="{{ appointment.time.strftime('%H:%M') }}">
+                    </div>
+
+                    <div>
+                        <label for="status" class="form-label">Status</label>
+                        <select name="status" id="status" required class="form-select">
+                            <option value="scheduled" {% if appointment.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                            <option value="completed" {% if appointment.status == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="cancelled" {% if appointment.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea name="notes" id="notes" rows="3" class="form-textarea">{{ appointment.notes }}</textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" onclick="window.history.back()" 
+                            class="btn btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Update Appointment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

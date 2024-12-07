@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Prescription Details - DentFlow Pro{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">Prescription Details</h1>
+        <div class="flex space-x-4">
+            <a href="{{ url_for('prescriptions.edit', id=prescription.id) }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                <i class="fas fa-edit mr-2"></i> Edit Prescription
+            </a>
+            <a href="{{ url_for('prescriptions.view', id=prescription.id) }}?print=true" target="_blank" class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <i class="fas fa-print mr-2"></i> Print
+            </a>
+            <a href="{{ url_for('prescriptions.index') }}" class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <i class="fas fa-arrow-left mr-2"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <!-- Prescription Header -->
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        Patient: {{ prescription.patient.full_name }}
+                    </h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                        Prescribed on {{ prescription.date.strftime('%B %d, %Y') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prescription Details -->
+        <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <dt class="text-sm font-medium text-gray-500">Diagnosis</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ prescription.diagnosis }}</dd>
+                </div>
+                {% if prescription.notes %}
+                <div class="sm:col-span-2">
+                    <dt class="text-sm font-medium text-gray-500">Notes</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ prescription.notes }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+        </div>
+
+        <!-- Medications -->
+        <div class="px-4 py-5 sm:px-6">
+            <h4 class="text-lg font-medium text-gray-900 mb-4">Medications</h4>
+            <div class="space-y-6">
+                {% for medication in prescription.medications %}
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <dt class="text-sm font-medium text-gray-500">Medication Name</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ medication.name }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Dosage</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ medication.dosage }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Frequency</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ medication.frequency }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Duration</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ medication.duration }}</dd>
+                        </div>
+                        {% if medication.instructions %}
+                        <div class="sm:col-span-2">
+                            <dt class="text-sm font-medium text-gray-500">Special Instructions</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ medication.instructions }}</dd>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

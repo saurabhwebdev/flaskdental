@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Prescription - DentFlow Pro{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">Edit Prescription</h1>
+        <div>
+            <a href="{{ url_for('prescriptions.view', id=prescription.id) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <i class="fas fa-arrow-left mr-2"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white shadow sm:rounded-lg">
+        <form method="POST" class="space-y-6 p-6">
+            <!-- Patient Information (Read-only) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Patient</label>
+                <div class="mt-1 p-3 bg-gray-50 rounded-md">
+                    {{ prescription.patient.full_name }}
+                </div>
+            </div>
+
+            <!-- Diagnosis -->
+            <div>
+                <label for="diagnosis" class="block text-sm font-medium text-gray-700">Diagnosis</label>
+                <div class="mt-1">
+                    <textarea id="diagnosis" name="diagnosis" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">{{ prescription.diagnosis }}</textarea>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+                <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+                <div class="mt-1">
+                    <textarea id="notes" name="notes" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">{{ prescription.notes }}</textarea>
+                </div>
+            </div>
+
+            <!-- Medications -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-4">Medications</label>
+                <div id="medications-container">
+                    {% for medication in prescription.medications %}
+                    <div class="medication-entry bg-gray-50 p-4 rounded-lg mb-4">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Medication Name</label>
+                                <input type="text" name="medication_name[]" value="{{ medication.name }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Dosage</label>
+                                <input type="text" name="medication_dosage[]" value="{{ medication.dosage }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Frequency</label>
+                                <input type="text" name="medication_frequency[]" value="{{ medication.frequency }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Duration</label>
+                                <input type="text" name="medication_duration[]" value="{{ medication.duration }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Special Instructions</label>
+                                <input type="text" name="medication_instructions[]" value="{{ medication.instructions }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <button type="button" onclick="removeMedication(this)" class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                    <i class="fas fa-trash-alt mr-2"></i> Remove Medication
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" onclick="addMedication()" class="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-plus mr-2"></i> Add Medication
+                </button>
+            </div>
+
+            <div class="pt-5">
+                <div class="flex justify-end">
+                    <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function addMedication() {
+    const container = document.getElementById('medications-container');
+    const newMedication = `
+        <div class="medication-entry bg-gray-50 p-4 rounded-lg mb-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Medication Name</label>
+                    <input type="text" name="medication_name[]" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Dosage</label>
+                    <input type="text" name="medication_dosage[]" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Frequency</label>
+                    <input type="text" name="medication_frequency[]" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Duration</label>
+                    <input type="text" name="medication_duration[]" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Special Instructions</label>
+                    <input type="text" name="medication_instructions[]" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div class="sm:col-span-2">
+                    <button type="button" onclick="removeMedication(this)" class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <i class="fas fa-trash-alt mr-2"></i> Remove Medication
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', newMedication);
+}
+
+function removeMedication(button) {
+    button.closest('.medication-entry').remove();
+}
+</script>
+{% endblock %}

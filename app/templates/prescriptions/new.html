@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}New Prescription - DentFlow Pro{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold text-gray-900">New Prescription</h1>
+        <a href="{{ url_for('prescriptions.index') }}" class="text-blue-600 hover:text-blue-900">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Prescriptions
+        </a>
+    </div>
+
+    <div class="mt-6">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+            <form method="POST">
+                <div class="space-y-6">
+                    <div>
+                        <label for="patient_id" class="form-label">Patient</label>
+                        <select name="patient_id" id="patient_id" required class="form-select">
+                            <option value="">Select Patient</option>
+                            {% for patient in patients %}
+                            <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="diagnosis" class="form-label">Diagnosis</label>
+                        <textarea name="diagnosis" id="diagnosis" rows="3" required class="form-textarea"></textarea>
+                    </div>
+
+                    <div id="medications">
+                        <label class="form-label">Medications</label>
+                        <div class="space-y-4">
+                            <div class="medication-entry grid grid-cols-1 gap-4 sm:grid-cols-4">
+                                <div class="sm:col-span-2">
+                                    <input type="text" name="medications[]" placeholder="Medication Name" required class="form-input">
+                                </div>
+                                <div>
+                                    <input type="text" name="dosages[]" placeholder="Dosage" required class="form-input">
+                                </div>
+                                <div>
+                                    <input type="text" name="frequencies[]" placeholder="Frequency" required class="form-input">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="addMedication()" class="mt-2 inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-plus mr-2"></i> Add Medication
+                        </button>
+                    </div>
+
+                    <div>
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea name="notes" id="notes" rows="3" class="form-textarea"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" onclick="window.history.back()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-blue-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Create Prescription
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function addMedication() {
+    const container = document.querySelector('#medications .space-y-4');
+    const newEntry = document.createElement('div');
+    newEntry.className = 'medication-entry grid grid-cols-1 gap-4 sm:grid-cols-4';
+    newEntry.innerHTML = `
+        <div class="sm:col-span-2">
+            <input type="text" name="medications[]" placeholder="Medication Name" required class="form-input">
+        </div>
+        <div>
+            <input type="text" name="dosages[]" placeholder="Dosage" required class="form-input">
+        </div>
+        <div class="flex items-center">
+            <input type="text" name="frequencies[]" placeholder="Frequency" required class="form-input">
+            <button type="button" onclick="this.closest('.medication-entry').remove()" class="ml-2 text-red-600 hover:text-red-900">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(newEntry);
+}
+</script>
+{% endblock %}

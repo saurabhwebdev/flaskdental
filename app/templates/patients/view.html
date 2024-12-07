@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}{{ patient.full_name }} - DentFlow Pro{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold text-gray-900">Patient Details</h1>
+        <div>
+            <a href="{{ url_for('patients.edit', id=patient.id) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">
+                <i class="fas fa-edit mr-2"></i> Edit
+            </a>
+            <a href="{{ url_for('patients.index') }}" class="text-blue-600 hover:text-blue-900">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Patients
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-6">
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div class="px-4 py-5 sm:px-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-user-circle text-gray-400 text-4xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                            {{ patient.full_name }}
+                        </h3>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                            Patient ID: {{ patient.id }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-200">
+                <dl>
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Date of Birth
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {{ patient.date_of_birth.strftime('%B %d, %Y') }}
+                        </dd>
+                    </div>
+                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Gender
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {{ patient.gender|title }}
+                        </dd>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Contact Information
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <div>Phone: {{ patient.phone }}</div>
+                            <div>Email: {{ patient.email }}</div>
+                            <div>Address: {{ patient.address }}</div>
+                        </dd>
+                    </div>
+                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            Medical History
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {{ patient.medical_history or 'No medical history recorded' }}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointments Section -->
+    <div class="mt-8">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-900">Appointments</h2>
+            <a href="{{ url_for('appointments.new', patient_id=patient.id) }}" 
+               class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i> New Appointment
+            </a>
+        </div>
+        <div class="mt-4 bg-white shadow overflow-hidden sm:rounded-lg">
+            {% if patient.appointments %}
+            <ul class="divide-y divide-gray-200">
+                {% for appointment in patient.appointments %}
+                <li class="px-4 py-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">
+                                {{ appointment.date.strftime('%B %d, %Y') }} at {{ appointment.time.strftime('%I:%M %p') }}
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                {{ appointment.treatment_type|title }}
+                            </p>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                       {% if appointment.status == 'scheduled' %}bg-yellow-100 text-yellow-800
+                                       {% elif appointment.status == 'completed' %}bg-green-100 text-green-800
+                                       {% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ appointment.status|title }}
+                            </span>
+                        </div>
+                        <a href="{{ url_for('appointments.edit', id=appointment.id) }}" 
+                           class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="p-4 text-sm text-gray-500">No appointments scheduled</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Prescriptions Section -->
+    <div class="mt-8">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-900">Prescriptions</h2>
+            <a href="{{ url_for('prescriptions.new', patient_id=patient.id) }}" 
+               class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i> New Prescription
+            </a>
+        </div>
+        <div class="mt-4 bg-white shadow overflow-hidden sm:rounded-lg">
+            {% if patient.prescriptions %}
+            <ul class="divide-y divide-gray-200">
+                {% for prescription in patient.prescriptions %}
+                <li class="px-4 py-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">
+                                {{ prescription.date.strftime('%B %d, %Y') }}
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                {{ prescription.diagnosis }}
+                            </p>
+                        </div>
+                        <a href="{{ url_for('prescriptions.edit', id=prescription.id) }}" 
+                           class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="p-4 text-sm text-gray-500">No prescriptions recorded</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

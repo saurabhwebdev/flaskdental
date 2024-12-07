@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prescription - {{ prescription.patient.full_name }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .container {
+            max-width: 21cm;
+            margin: 0 auto;
+            padding: 2cm;
+            position: relative;
+            background: #ffffff;
+        }
+
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 150px;
+            color: rgba(37, 99, 235, 0.03);
+            z-index: 0;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .border-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid #e5e7eb;
+            margin: 1cm;
+            pointer-events: none;
+        }
+
+        .border-pattern::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 2px solid #2563eb;
+            opacity: 0.1;
+        }
+
+        .header {
+            position: relative;
+            text-align: center;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        .logo-container {
+            margin-bottom: 15px;
+        }
+
+        .clinic-logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2563eb;
+            letter-spacing: -1px;
+        }
+
+        .clinic-pro {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .clinic-details {
+            font-size: 14px;
+            color: #64748b;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .clinic-details span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .rx-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(148, 163, 184, 0.1);
+        }
+
+        .patient-info, .prescription-info {
+            flex: 1;
+        }
+
+        .prescription-info {
+            text-align: right;
+        }
+
+        .info-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #1e293b;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .rx-symbol {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 36px;
+            color: #2563eb;
+            background: #ffffff;
+            padding: 0 10px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(148, 163, 184, 0.1);
+        }
+
+        .content-section {
+            position: relative;
+            background: #ffffff;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .medication-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .medication-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .medication-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .medication-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .instructions {
+            grid-column: 1 / -1;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: right;
+            position: relative;
+        }
+
+        .signature-section {
+            display: inline-block;
+            text-align: center;
+            margin-left: auto;
+        }
+
+        .signature-line {
+            width: 200px;
+            border-bottom: 2px solid #2563eb;
+            margin-bottom: 8px;
+        }
+
+        .doctor-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 16px;
+        }
+
+        .doctor-details {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .qr-code {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            opacity: 0.5;
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            .container {
+                padding: 1.5cm;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            .content-section {
+                break-inside: avoid;
+            }
+
+            .medication-item {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="border-pattern"></div>
+    <div class="watermark">DentFlow Pro</div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <div class="clinic-logo">
+                    Dent<span style="color: #3b82f6;">Flow</span><span class="clinic-pro">Pro</span>
+                </div>
+            </div>
+            <div class="clinic-details">
+                {% if settings.clinic_name %}
+                <span><i class="fas fa-hospital"></i> {{ settings.clinic_name }}</span>
+                {% endif %}
+                {% if settings.clinic_address %}
+                <span><i class="fas fa-location-dot"></i> {{ settings.clinic_address }}</span>
+                {% endif %}
+                {% if settings.clinic_phone %}
+                <span><i class="fas fa-phone"></i> {{ settings.clinic_phone }}</span>
+                {% endif %}
+                {% if settings.clinic_email %}
+                <span><i class="fas fa-envelope"></i> {{ settings.clinic_email }}</span>
+                {% endif %}
+            </div>
+        </header>
+
+        <div class="rx-header">
+            <div class="patient-info">
+                <div class="info-label">Patient Name</div>
+                <div class="info-value">{{ prescription.patient.full_name }}</div>
+                
+                {% if prescription.patient.date_of_birth %}
+                <div class="info-label">Date of Birth</div>
+                <div class="info-value">{{ prescription.patient.date_of_birth.strftime('%B %d, %Y') }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="prescription-info">
+                <div class="info-label">Prescription Date</div>
+                <div class="info-value">{{ prescription.date.strftime('%B %d, %Y') }}</div>
+                
+                <div class="info-label">Prescription ID</div>
+                <div class="info-value">#{{ prescription.id }}</div>
+            </div>
+        </div>
+
+        {% if prescription.diagnosis %}
+        <section class="content-section">
+            <h3 class="section-title">Diagnosis</h3>
+            <p style="color: #475569;">{{ prescription.diagnosis }}</p>
+        </section>
+        {% endif %}
+
+        <section class="content-section">
+            <span class="rx-symbol">℞</span>
+            <h3 class="section-title">Medications</h3>
+            <div class="medication-list">
+                {% if prescription.medications %}
+                    {% for medication in prescription.medications %}
+                    <div class="medication-item">
+                        <div class="medication-name">{{ medication.name }}</div>
+                        <div class="medication-details">
+                            {% if medication.dosage %}
+                            <div class="detail-item">
+                                <span class="detail-label">Dosage:</span>
+                                <span>{{ medication.dosage }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if medication.frequency %}
+                            <div class="detail-item">
+                                <span class="detail-label">Frequency:</span>
+                                <span>{{ medication.frequency }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if medication.duration %}
+                            <div class="detail-item">
+                                <span class="detail-label">Duration:</span>
+                                <span>{{ medication.duration }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if medication.instructions %}
+                            <div class="detail-item instructions">
+                                <span class="detail-label">Special Instructions:</span>
+                                <span>{{ medication.instructions }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: #64748b; text-align: center; padding: 20px;">No medications prescribed</p>
+                {% endif %}
+            </div>
+        </section>
+
+        {% if prescription.notes %}
+        <section class="content-section">
+            <h3 class="section-title">Additional Notes</h3>
+            <p style="color: #475569;">{{ prescription.notes }}</p>
+        </section>
+        {% endif %}
+
+        <footer class="footer">
+            <div class="signature-section">
+                <div class="signature-line"></div>
+                <div class="doctor-name">
+                    {% if settings.doctor_name %}Dr. {{ settings.doctor_name }}{% else %}Doctor's Signature{% endif %}
+                </div>
+                <div class="doctor-details">
+                    {% if settings.clinic_name %}{{ settings.clinic_name }}{% endif %}
+                    {% if settings.doctor_qualification %}<br>{{ settings.doctor_qualification }}{% endif %}
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        window.onload = function() {
+            if (window.location.search.includes('print=true')) {
+                window.print();
+            }
+        };
+    </script>
+</body>
+</html>

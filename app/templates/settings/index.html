@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - DentFlow Pro{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold text-gray-900">Clinic Settings</h1>
+    </div>
+
+    <div class="mt-6">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+            <form method="POST">
+                <div class="space-y-8">
+                    <!-- Clinic Information -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Clinic Information</h3>
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                            <div>
+                                <label for="clinic_name" class="form-label">Clinic Name</label>
+                                <input type="text" name="clinic_name" id="clinic_name" value="{{ settings.clinic_name if settings else '' }}" required class="form-input">
+                            </div>
+
+                            <div>
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" name="phone" id="phone" value="{{ settings.phone if settings else '' }}" required class="form-input">
+                            </div>
+
+                            <div>
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" name="email" id="email" value="{{ settings.email if settings else '' }}" required class="form-input">
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label for="address" class="form-label">Address</label>
+                                <textarea name="address" id="address" rows="3" required class="form-textarea">{{ settings.address if settings else '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Hours -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Business Hours</h3>
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                            {% for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+                            <div class="flex items-center space-x-4">
+                                <div class="w-24">
+                                    <span class="form-label capitalize">{{ day }}</span>
+                                </div>
+                                <div class="flex-1 flex space-x-2">
+                                    <input type="time" name="{{ day }}_start" value="{{ settings[day + '_start'] if settings else '09:00' }}" class="form-input">
+                                    <span class="text-gray-500 self-center">to</span>
+                                    <input type="time" name="{{ day }}_end" value="{{ settings[day + '_end'] if settings else '17:00' }}" class="form-input">
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Invoice Settings -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Invoice Settings</h3>
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                            <div>
+                                <label for="currency" class="form-label">Currency</label>
+                                <select name="currency" id="currency" class="form-select">
+                                    {% for code, symbol, name in currencies %}
+                                    <option value="{{ code }}" {% if settings and settings.currency == code %}selected{% endif %}>
+                                        {{ name }} ({{ symbol }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="tax_rate" class="form-label">Default Tax Rate (%)</label>
+                                <input type="number" name="default_tax_rate" id="tax_rate" min="0" max="100" step="0.01" 
+                                    value="{{ settings.default_tax_rate if settings else 0 }}" class="form-input">
+                            </div>
+
+                            <div>
+                                <label for="invoice_prefix" class="form-label">Invoice Number Prefix</label>
+                                <input type="text" name="invoice_prefix" id="invoice_prefix" 
+                                    value="{{ settings.invoice_prefix if settings else 'INV-' }}" class="form-input">
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label for="invoice_footer" class="form-label">Invoice Footer Text</label>
+                                <textarea name="invoice_footer" id="invoice_footer" rows="3" class="form-textarea">{{ settings.invoice_footer if settings else 'Thank you for your business!' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Settings -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Email Notifications</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="appointment_reminders" id="appointment_reminders" {% if settings and settings.appointment_reminders %}checked{% endif %} class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="appointment_reminders" class="ml-2 block text-sm text-gray-900">Send appointment reminders</label>
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" name="invoice_reminders" id="invoice_reminders" {% if settings and settings.invoice_reminders %}checked{% endif %} class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="invoice_reminders" class="ml-2 block text-sm text-gray-900">Send invoice payment reminders</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" onclick="window.history.back()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-blue-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

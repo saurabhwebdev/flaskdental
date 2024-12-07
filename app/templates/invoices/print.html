@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice #{{ invoice.id }} - {{ invoice.patient.full_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        .clinic-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .clinic-details {
+            font-size: 14px;
+            color: #666;
+        }
+        .invoice-info {
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .patient-info {
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .amount-right {
+            text-align: right;
+        }
+        .total-section {
+            margin-top: 20px;
+            border-top: 2px solid #333;
+            padding-top: 20px;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        .total-label {
+            font-weight: bold;
+        }
+        .total-amount {
+            text-align: right;
+            min-width: 100px;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-paid {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .status-partially-paid {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .status-unpaid {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        @media print {
+            body {
+                margin: 20px;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="clinic-name">{{ settings.clinic_name or 'DentFlow Pro' }}</div>
+        <div class="clinic-details">
+            {% if settings.clinic_address %}{{ settings.clinic_address }}<br>{% endif %}
+            {% if settings.clinic_phone %}Phone: {{ settings.clinic_phone }}<br>{% endif %}
+            {% if settings.clinic_email %}Email: {{ settings.clinic_email }}{% endif %}
+        </div>
+    </div>
+
+    <div class="invoice-info">
+        <div>
+            <h2>Invoice #{{ invoice.id }}</h2>
+            <p>
+                Date: {{ invoice.date.strftime('%B %d, %Y') }}<br>
+                Due Date: {{ invoice.due_date.strftime('%B %d, %Y') }}
+            </p>
+        </div>
+        <div class="status status-{{ invoice.status }}">
+            {{ invoice.status|replace('_', ' ')|title }}
+        </div>
+    </div>
+
+    <div class="patient-info">
+        <h3>Bill To:</h3>
+        <p>
+            {{ invoice.patient.full_name }}<br>
+            {% if invoice.patient.address %}{{ invoice.patient.address }}<br>{% endif %}
+            {% if invoice.patient.phone %}Phone: {{ invoice.patient.phone }}<br>{% endif %}
+            {% if invoice.patient.email %}Email: {{ invoice.patient.email }}{% endif %}
+        </p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th class="amount-right">Quantity</th>
+                <th class="amount-right">Unit Price</th>
+                <th class="amount-right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in invoice.items %}
+            <tr>
+                <td>{{ item.description }}</td>
+                <td class="amount-right">{{ item.quantity }}</td>
+                <td class="amount-right">{{ settings.currency_symbol }}{{ "%.2f"|format(item.unit_price) }}</td>
+                <td class="amount-right">{{ settings.currency_symbol }}{{ "%.2f"|format(item.total) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total-section">
+        <div class="total-row">
+            <span class="total-label">Subtotal:</span>
+            <span class="total-amount">{{ settings.currency_symbol }}{{ "%.2f"|format(invoice.subtotal) }}</span>
+        </div>
+        <div class="total-row">
+            <span class="total-label">Tax ({{ "%.1f"|format(invoice.tax_rate) }}%):</span>
+            <span class="total-amount">{{ settings.currency_symbol }}{{ "%.2f"|format(invoice.tax_amount) }}</span>
+        </div>
+        <div class="total-row">
+            <span class="total-label">Total Amount:</span>
+            <span class="total-amount">{{ settings.currency_symbol }}{{ "%.2f"|format(invoice.total_amount) }}</span>
+        </div>
+        {% if invoice.paid_amount > 0 %}
+        <div class="total-row">
+            <span class="total-label">Paid Amount:</span>
+            <span class="total-amount">{{ settings.currency_symbol }}{{ "%.2f"|format(invoice.paid_amount) }}</span>
+        </div>
+        <div class="total-row">
+            <span class="total-label">Balance Due:</span>
+            <span class="total-amount">{{ settings.currency_symbol }}{{ "%.2f"|format(invoice.total_amount - invoice.paid_amount) }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if invoice.notes %}
+    <div style="margin-top: 30px;">
+        <h3>Notes:</h3>
+        <p>{{ invoice.notes }}</p>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        Thank you for choosing our dental clinic!
+    </div>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
