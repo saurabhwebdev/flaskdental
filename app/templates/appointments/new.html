@@ -26,15 +26,15 @@
                     </div>
 
                     <div>
-                        <label for="appointment_type" class="form-label">Appointment Type</label>
-                        <select name="appointment_type" id="appointment_type" required class="form-select">
+                        <label for="treatment_type" class="form-label">Treatment Type</label>
+                        <select name="treatment_type" id="treatment_type" required class="form-select">
                             <option value="">Select Type</option>
-                            <option value="checkup">Check-up</option>
-                            <option value="cleaning">Cleaning</option>
-                            <option value="filling">Filling</option>
-                            <option value="extraction">Extraction</option>
-                            <option value="root_canal">Root Canal</option>
-                            <option value="other">Other</option>
+                            <option value="Checkup">Check-up</option>
+                            <option value="Cleaning">Cleaning</option>
+                            <option value="Filling">Filling</option>
+                            <option value="Extraction">Extraction</option>
+                            <option value="Root Canal">Root Canal</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
 
@@ -46,6 +46,16 @@
                     <div>
                         <label for="time" class="form-label">Time</label>
                         <input type="time" name="time" id="time" required class="form-input">
+                    </div>
+
+                    <div>
+                        <label for="duration" class="form-label">Duration (minutes)</label>
+                        <select name="duration" id="duration" required class="form-select">
+                            <option value="30">30 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="90">1.5 hours</option>
+                            <option value="120">2 hours</option>
+                        </select>
                     </div>
 
                     <div class="sm:col-span-2">

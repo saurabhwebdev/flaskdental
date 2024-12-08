@@ -4,6 +4,10 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from datetime import datetime
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -18,7 +22,11 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dental_clinic.db'
+    
+    # Set up the SQLite database path
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    db_path = os.path.join(os.path.dirname(basedir), 'instance', 'dental_clinic.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize extensions
@@ -35,6 +43,7 @@ def create_app():
         from app.models.prescription import Prescription, Medication
         from app.models.invoice import Invoice
         from app.models.settings import Settings
+        from app.models.appointment import Appointment
         
         # Import routes
         from app.routes import auth, patients, appointments, prescriptions, invoices, settings, main
@@ -50,5 +59,5 @@ def create_app():
 
         # Create database tables
         db.create_all()
-
+        
         return app
