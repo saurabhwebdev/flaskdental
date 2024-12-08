@@ -3,14 +3,46 @@ from flask_login import login_required
 from app.models.patient import Patient
 from app import db
 from datetime import datetime, date
+from app.utils.pagination import PaginationHelper, SearchHelper, FilterHelper, get_search_args
 
 bp = Blueprint('patients', __name__, url_prefix='/patients')
 
 @bp.route('/')
 @login_required
 def index():
-    patients = Patient.query.order_by(Patient.last_name).all()
-    return render_template('patients/index.html', patients=patients)
+    # Get search and filter parameters
+    search_term, filters = get_search_args()
+    
+    # Get pagination parameters
+    page, per_page = PaginationHelper.get_page_args()
+    
+    # Start with base query
+    query = Patient.query
+    
+    # Apply search if provided
+    search_fields = ['first_name', 'last_name', 'email', 'phone']
+    query = SearchHelper.apply_search(query, Patient, search_term, search_fields)
+    
+    # Apply filters if provided
+    query = FilterHelper.apply_filters(query, Patient, filters)
+    
+    # Order by name
+    query = query.order_by(Patient.last_name, Patient.first_name)
+    
+    # Paginate results
+    pagination = PaginationHelper(Patient, page, per_page)
+    patients = pagination.paginate_query(query)
+    
+    # Get current date for age calculation
+    current_date = date.today()
+    
+    return render_template(
+        'patients/index.html',
+        patients=patients,
+        search_term=search_term,
+        filters=filters,
+        now=current_date
+    )
 
 @bp.route('/new', methods=['GET', 'POST'])
 @login_required

@@ -5,14 +5,62 @@ from app.models.patient import Patient
 from app.models.settings import Settings
 from app import db
 from datetime import datetime, date
+from app.utils.pagination import PaginationHelper, SearchHelper, FilterHelper, get_search_args
 
 prescriptions = Blueprint('prescriptions', __name__)
 
 @prescriptions.route('/prescriptions')
 @login_required
 def index():
-    prescriptions = Prescription.query.order_by(Prescription.date.desc()).all()
-    return render_template('prescriptions/index.html', prescriptions=prescriptions)
+    # Get search and filter parameters
+    search_term, filters = get_search_args()
+    
+    # Get pagination parameters
+    page, per_page = PaginationHelper.get_page_args()
+    
+    # Start with base query
+    query = Prescription.query.join(Patient)
+    
+    # Apply search if provided
+    search_fields = ['diagnosis', 'notes', 'Patient.first_name', 'Patient.last_name']
+    if search_term:
+        search_filters = []
+        for field in search_fields:
+            if '.' in field:
+                model_name, field_name = field.split('.')
+                if model_name == 'Patient':
+                    search_filters.append(getattr(Patient, field_name).ilike(f'%{search_term}%'))
+            else:
+                search_filters.append(getattr(Prescription, field).ilike(f'%{search_term}%'))
+        if search_filters:
+            query = query.filter(db.or_(*search_filters))
+    
+    # Apply date filter if provided
+    date_filter = request.args.get('filter_date')
+    if date_filter:
+        try:
+            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+            query = query.filter(Prescription.date == filter_date)
+        except ValueError:
+            flash('Invalid date format', 'error')
+    
+    # Order by date
+    query = query.order_by(Prescription.date.desc())
+    
+    # Paginate results
+    pagination = PaginationHelper(Prescription, page, per_page)
+    prescriptions = pagination.paginate_query(query)
+    
+    # Get current date for template
+    current_date = date.today()
+    
+    return render_template(
+        'prescriptions/index.html',
+        prescriptions=prescriptions,
+        search_term=search_term,
+        filters=filters,
+        now=current_date
+    )
 
 @prescriptions.route('/prescriptions/new', methods=['GET', 'POST'])
 @login_required

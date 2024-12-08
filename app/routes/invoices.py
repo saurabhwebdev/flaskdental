@@ -4,16 +4,71 @@ from app.models.invoice import Invoice
 from app.models.patient import Patient
 from app.models.settings import Settings
 from app import db
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
+from app.utils.pagination import PaginationHelper, SearchHelper, FilterHelper, get_search_args
 
 invoices = Blueprint('invoices', __name__, url_prefix='/invoices')
 
 @invoices.route('/')
 @login_required
 def index():
-    invoices = Invoice.query.order_by(Invoice.date.desc()).all()
+    # Get search and filter parameters
+    search_term, filters = get_search_args()
+    
+    # Get pagination parameters
+    page, per_page = PaginationHelper.get_page_args()
+    
+    # Start with base query
+    query = Invoice.query.join(Patient)
+    
+    # Apply search if provided
+    search_fields = ['notes', 'Patient.first_name', 'Patient.last_name']
+    if search_term:
+        search_filters = []
+        for field in search_fields:
+            if '.' in field:
+                model_name, field_name = field.split('.')
+                if model_name == 'Patient':
+                    search_filters.append(getattr(Patient, field_name).ilike(f'%{search_term}%'))
+            else:
+                search_filters.append(getattr(Invoice, field).ilike(f'%{search_term}%'))
+        if search_filters:
+            query = query.filter(db.or_(*search_filters))
+    
+    # Apply date filter if provided
+    date_filter = request.args.get('filter_date')
+    if date_filter:
+        try:
+            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+            query = query.filter(Invoice.date == filter_date)
+        except ValueError:
+            flash('Invalid date format', 'error')
+    
+    # Apply status filter if provided
+    status_filter = request.args.get('filter_status')
+    if status_filter:
+        query = query.filter(Invoice.status == status_filter)
+    
+    # Order by date and id (which is used to generate invoice number)
+    query = query.order_by(Invoice.date.desc(), Invoice.id.desc())
+    
+    # Paginate results
+    pagination = PaginationHelper(Invoice, page, per_page)
+    invoices = pagination.paginate_query(query)
+    
+    # Get current date for template
+    current_date = date.today()
+    
     settings = Settings.query.first()
-    return render_template('invoices/index.html', invoices=invoices, settings=settings)
+    
+    return render_template(
+        'invoices/index.html',
+        invoices=invoices,
+        search_term=search_term,
+        filters=filters,
+        now=current_date,
+        settings=settings
+    )
 
 @invoices.route('/new', methods=['GET', 'POST'])
 @login_required
@@ -82,6 +137,59 @@ def new():
     today = datetime.now().strftime('%Y-%m-%d')
     due_date = (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')
     return render_template('invoices/new.html', patients=patients, today=today, due_date=due_date, settings=settings)
+
+@invoices.route('/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit(id):
+    invoice = Invoice.query.get_or_404(id)
+    if request.method == 'POST':
+        try:
+            # Update invoice fields
+            invoice.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+            invoice.due_date = datetime.strptime(request.form['due_date'], '%Y-%m-%d').date()
+            invoice.status = request.form['status']
+            invoice.notes = request.form['notes']
+            
+            # Handle items and amounts
+            descriptions = request.form.getlist('item_description[]')
+            quantities = request.form.getlist('item_quantity[]')
+            prices = request.form.getlist('item_price[]')
+            items = []
+            subtotal = 0
+            for desc, qty, price in zip(descriptions, quantities, prices):
+                quantity = int(qty)
+                unit_price = float(price)
+                total = quantity * unit_price
+                subtotal += total
+                items.append({
+                    'description': desc,
+                    'quantity': quantity,
+                    'unit_price': unit_price,
+                    'total': total
+                })
+            
+            tax_rate = float(request.form.get('tax_rate', 0))
+            tax_amount = subtotal * (tax_rate / 100)
+            total_amount = subtotal + tax_amount
+            
+            invoice.items = items
+            invoice.subtotal = subtotal
+            invoice.tax_rate = tax_rate
+            invoice.tax_amount = tax_amount
+            invoice.total_amount = total_amount
+            invoice.paid_amount = float(request.form.get('paid_amount', 0))
+            
+            db.session.commit()
+            flash('Invoice updated successfully', 'success')
+            return redirect(url_for('invoices.view', id=invoice.id))
+            
+        except Exception as e:
+            flash('Error updating invoice: ' + str(e), 'error')
+            db.session.rollback()
+    
+    patients = Patient.query.order_by(Patient.first_name).all()
+    settings = Settings.query.first()
+    return render_template('invoices/edit.html', invoice=invoice, patients=patients, settings=settings)
 
 @invoices.route('/<int:id>')
 @login_required

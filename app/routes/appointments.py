@@ -4,8 +4,9 @@ from app.models.appointment import Appointment
 from app.models.patient import Patient
 from app.models.settings import Settings
 from app.utils.email_sender import send_appointment_email
+from app.utils.pagination import PaginationHelper, SearchHelper, FilterHelper, get_search_args
 from app import db
-from datetime import datetime
+from datetime import datetime, date
 import logging
 
 # Set up logging
@@ -17,8 +18,60 @@ bp = Blueprint('appointments', __name__, url_prefix='/appointments')
 @bp.route('/')
 @login_required
 def index():
-    appointments = Appointment.query.order_by(Appointment.date, Appointment.time).all()
-    return render_template('appointments/index.html', appointments=appointments)
+    # Get search and filter parameters
+    search_term, filters = get_search_args()
+    
+    # Get pagination parameters
+    page, per_page = PaginationHelper.get_page_args()
+    
+    # Start with base query
+    query = Appointment.query.join(Patient)
+    
+    # Apply search if provided
+    search_fields = ['treatment_type', 'notes', 'Patient.first_name', 'Patient.last_name']
+    if search_term:
+        search_filters = []
+        for field in search_fields:
+            if '.' in field:
+                model_name, field_name = field.split('.')
+                if model_name == 'Patient':
+                    search_filters.append(getattr(Patient, field_name).ilike(f'%{search_term}%'))
+            else:
+                search_filters.append(getattr(Appointment, field).ilike(f'%{search_term}%'))
+        if search_filters:
+            query = query.filter(db.or_(*search_filters))
+    
+    # Apply date filter if provided
+    date_filter = request.args.get('filter_date')
+    if date_filter:
+        try:
+            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+            query = query.filter(Appointment.date == filter_date)
+        except ValueError:
+            flash('Invalid date format', 'error')
+    
+    # Apply status filter if provided
+    status_filter = request.args.get('filter_status')
+    if status_filter:
+        query = query.filter(Appointment.status == status_filter)
+    
+    # Order by date and time
+    query = query.order_by(Appointment.date.desc(), Appointment.time.asc())
+    
+    # Paginate results
+    pagination = PaginationHelper(Appointment, page, per_page)
+    appointments = pagination.paginate_query(query)
+    
+    # Get current date for template
+    current_date = date.today()
+    
+    return render_template(
+        'appointments/index.html',
+        appointments=appointments,
+        search_term=search_term,
+        filters=filters,
+        now=current_date
+    )
 
 @bp.route('/new', methods=['GET', 'POST'])
 @login_required

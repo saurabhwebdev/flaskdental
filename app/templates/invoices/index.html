@@ -1,80 +1,140 @@
 {% extends "base.html" %}
+{% from "components/search_filter.html" import search_bar, filter_select, pagination %}
 
 {% block title %}Invoices - DentFlow Pro{% endblock %}
 
 {% block content %}
 <div class="py-6">
-    <div class="flex items-center justify-between">
+    <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold text-gray-900">Invoices</h1>
-        <a href="{{ url_for('invoices.new') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+        <a href="{{ url_for('invoices.new') }}" class="btn btn-primary">
             <i class="fas fa-plus mr-2"></i> New Invoice
         </a>
     </div>
 
-    <div class="mt-6">
-        <div class="flex flex-col">
-            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice #</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                {% for invoice in invoices %}
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        #{{ invoice.id }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ invoice.patient.full_name }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ invoice.date.strftime('%Y-%m-%d') }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ invoice.due_date.strftime('%Y-%m-%d') }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                                        {{ settings.currency_symbol }}{{ "%.2f"|format(invoice.total_amount) }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {% if invoice.status == 'paid' %}bg-green-100 text-green-800
-                                            {% elif invoice.status == 'partially_paid' %}bg-yellow-100 text-yellow-800
-                                            {% else %}bg-red-100 text-red-800{% endif %}">
-                                            {{ invoice.status|replace('_', ' ')|title }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{{ url_for('invoices.view', id=invoice.id) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
-                                        <a href="{{ url_for('invoices.view', id=invoice.id, print=True) }}" target="_blank" class="text-gray-600 hover:text-gray-900 mr-4">
-                                            <i class="fas fa-print"></i> Print
-                                        </a>
-                                        <form method="POST" action="{{ url_for('invoices.delete', id=invoice.id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this invoice? This action cannot be undone.');">
-                                            <button type="submit" class="text-red-600 hover:text-red-900">
-                                                <i class="fas fa-trash"></i> Delete
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    <!-- Search and Filter Section -->
+    <div class="mb-6">
+        {{ search_bar(placeholder="Search by invoice number, patient name...") }}
+        
+        <div class="flex flex-wrap gap-4 mt-4">
+            <div class="w-full md:w-auto">
+                <label for="filter_date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input type="date" 
+                       id="filter_date" 
+                       name="filter_date" 
+                       value="{{ request.args.get('filter_date', '') }}"
+                       class="form-input rounded-md"
+                       onchange="this.form.submit()">
             </div>
+            
+            {{ filter_select(
+                'status',
+                [
+                    ('pending', 'Pending'),
+                    ('paid', 'Paid'),
+                    ('overdue', 'Overdue'),
+                    ('cancelled', 'Cancelled')
+                ],
+                request.args.get('filter_status'),
+                'Status'
+            ) }}
         </div>
     </div>
+
+    <!-- Invoices Table -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice #</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for invoice in invoices.items %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">
+                            {{ invoice.invoice_number }}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">
+                            {{ invoice.patient.first_name }} {{ invoice.patient.last_name }}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            {{ invoice.patient.phone }}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">
+                            {{ invoice.date.strftime('%B %d, %Y') }}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">
+                            {{ settings.currency_symbol }}{{ "%.2f"|format(invoice.total_amount) }}
+                        </div>
+                        {% if invoice.paid_amount > 0 %}
+                        <div class="text-sm text-gray-500">
+                            Paid: {{ settings.currency_symbol }}{{ "%.2f"|format(invoice.paid_amount) }}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if invoice.status == 'pending' %}
+                                bg-yellow-100 text-yellow-800
+                            {% elif invoice.status == 'paid' %}
+                                bg-green-100 text-green-800
+                            {% elif invoice.status == 'overdue' %}
+                                bg-red-100 text-red-800
+                            {% else %}
+                                bg-gray-100 text-gray-800
+                            {% endif %}">
+                            {{ invoice.status | title }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="{{ url_for('invoices.view', id=invoice.id) }}" 
+                           class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ url_for('invoices.edit', id=invoice.id) }}" 
+                           class="text-indigo-600 hover:text-indigo-900 mr-3">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{{ url_for('invoices.view', id=invoice.id, print='true') }}" 
+                           target="_blank"
+                           class="text-green-600 hover:text-green-900 mr-3">
+                            <i class="fas fa-print"></i>
+                        </a>
+                        <form action="{{ url_for('invoices.delete', id=invoice.id) }}" 
+                              method="POST" 
+                              class="inline"
+                              onsubmit="return confirm('Are you sure you want to delete this invoice?')">
+                            <button type="submit" class="text-red-600 hover:text-red-900">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                        No invoices found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {{ pagination(invoices) }}
 </div>
 {% endblock %}

@@ -57,6 +57,10 @@ def create_app():
         app.register_blueprint(invoices.invoices)
         app.register_blueprint(settings.settings)
 
+        # Register template helpers
+        from app.utils.template_helpers import update_url_query
+        app.jinja_env.globals.update(update_url_query=update_url_query)
+
         # Create database tables
         db.create_all()
         
