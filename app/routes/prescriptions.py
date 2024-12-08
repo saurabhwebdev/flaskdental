@@ -4,7 +4,7 @@ from app.models.prescription import Prescription, Medication
 from app.models.patient import Patient
 from app.models.settings import Settings
 from app import db
-from datetime import datetime
+from datetime import datetime, date
 
 prescriptions = Blueprint('prescriptions', __name__)
 
@@ -72,16 +72,18 @@ def view(id):
             settings = Settings()  # Create a default settings object if none exists
             db.session.add(settings)
             db.session.commit()
+        
+        current_date = date.today()
             
         print_mode = request.args.get('print', 'false').lower() == 'true'
         template = 'prescriptions/print.html' if print_mode else 'prescriptions/view.html'
         
-        # Ensure we're passing the settings to both templates
         return render_template(
             template,
             prescription=prescription,
             settings=settings,
-            print_mode=print_mode
+            print_mode=print_mode,
+            now=current_date
         )
     except Exception as e:
         print(f"Error in prescription view: {str(e)}")  # For debugging

@@ -33,15 +33,21 @@
                     <div id="medications">
                         <label class="form-label">Medications</label>
                         <div class="space-y-4">
-                            <div class="medication-entry grid grid-cols-1 gap-4 sm:grid-cols-4">
+                            <div class="medication-entry grid grid-cols-1 gap-4 sm:grid-cols-6">
                                 <div class="sm:col-span-2">
-                                    <input type="text" name="medications[]" placeholder="Medication Name" required class="form-input">
+                                    <input type="text" name="medication_name[]" placeholder="Medication Name" required class="form-input">
                                 </div>
                                 <div>
-                                    <input type="text" name="dosages[]" placeholder="Dosage" required class="form-input">
+                                    <input type="text" name="medication_dosage[]" placeholder="Dosage" required class="form-input">
                                 </div>
                                 <div>
-                                    <input type="text" name="frequencies[]" placeholder="Frequency" required class="form-input">
+                                    <input type="text" name="medication_frequency[]" placeholder="Frequency" required class="form-input">
+                                </div>
+                                <div>
+                                    <input type="text" name="medication_duration[]" placeholder="Duration" class="form-input">
+                                </div>
+                                <div>
+                                    <input type="text" name="medication_instructions[]" placeholder="Instructions" class="form-input">
                                 </div>
                             </div>
                         </div>
@@ -73,16 +79,22 @@
 function addMedication() {
     const container = document.querySelector('#medications .space-y-4');
     const newEntry = document.createElement('div');
-    newEntry.className = 'medication-entry grid grid-cols-1 gap-4 sm:grid-cols-4';
+    newEntry.className = 'medication-entry grid grid-cols-1 gap-4 sm:grid-cols-6';
     newEntry.innerHTML = `
         <div class="sm:col-span-2">
-            <input type="text" name="medications[]" placeholder="Medication Name" required class="form-input">
+            <input type="text" name="medication_name[]" placeholder="Medication Name" required class="form-input">
         </div>
         <div>
-            <input type="text" name="dosages[]" placeholder="Dosage" required class="form-input">
+            <input type="text" name="medication_dosage[]" placeholder="Dosage" required class="form-input">
+        </div>
+        <div>
+            <input type="text" name="medication_frequency[]" placeholder="Frequency" required class="form-input">
+        </div>
+        <div>
+            <input type="text" name="medication_duration[]" placeholder="Duration" class="form-input">
         </div>
         <div class="flex items-center">
-            <input type="text" name="frequencies[]" placeholder="Frequency" required class="form-input">
+            <input type="text" name="medication_instructions[]" placeholder="Instructions" class="form-input">
             <button type="button" onclick="this.closest('.medication-entry').remove()" class="ml-2 text-red-600 hover:text-red-900">
                 <i class="fas fa-trash"></i>
             </button>
