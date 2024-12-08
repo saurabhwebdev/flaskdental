@@ -45,6 +45,14 @@ A comprehensive web-based dental clinic management system built with Flask, offe
 - Tax rate settings
 - Invoice numbering customization
 
+### 7. Email Integration
+- Automatic appointment confirmation emails
+- Gmail SMTP integration
+- HTML email templates
+- Configurable email settings
+- Manual email resend functionality
+- Error handling and logging
+
 ## Technical Details
 
 ### Technology Stack
@@ -54,6 +62,7 @@ A comprehensive web-based dental clinic management system built with Flask, offe
 - **Frontend**: HTML, Tailwind CSS, JavaScript
 - **Form Handling**: Flask-WTF
 - **Database Migrations**: Flask-Migrate
+- **Email Service**: Gmail SMTP
 
 ### Project Structure
 ```
@@ -91,15 +100,6 @@ FlaskDental/
 ├── run.py                      # Application entry point
 ├── setup_db.py                # Database setup script
 └── create_user.py             # User creation utility
-```
-
-### Database Models
-1. **User**: Staff authentication and management
-2. **Patient**: Patient information and history
-3. **Appointment**: Scheduling and appointment tracking
-4. **Invoice**: Billing and payment records
-5. **Prescription**: Medical prescriptions and medications
-6. **Settings**: Application configuration and preferences
 
 ## Installation & Setup
 
@@ -134,6 +134,8 @@ FlaskDental/
    FLASK_ENV=development
    SECRET_KEY=your-secret-key
    DATABASE_URL=sqlite:///instance/dental.db
+   GMAIL_USER=your.clinic@gmail.com
+   GMAIL_APP_PASSWORD=your-app-password
    ```
 
 5. **Initialize Database**
@@ -164,6 +166,7 @@ FlaskDental/
    - Currency preferences
    - Tax rates
    - Invoice settings
+   - Email settings
 
 ### Daily Operations
 1. **Patient Management**
@@ -186,6 +189,11 @@ FlaskDental/
    - Create digital prescriptions
    - Print prescriptions
    - View prescription history
+
+5. **Email Management**
+   - Configure email settings
+   - Send appointment confirmations
+   - Resend emails manually
 
 ## Customization
 
@@ -241,6 +249,11 @@ Regular backups of the `instance/dental.db` file are recommended.
    - Check for missing template files
    - Validate context variables
 
+4. **Email Issues**
+   - Check email settings
+   - Verify Gmail credentials
+   - Check email logs for errors
+
 ## Security Considerations
 
 1. **Authentication**
@@ -261,7 +274,6 @@ Regular backups of the `instance/dental.db` file are recommended.
 ## Future Enhancements
 
 1. **Planned Features**
-   - Email notifications
    - SMS reminders
    - Online appointment booking
    - Patient portal

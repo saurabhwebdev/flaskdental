@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required
 from app.models.patient import Patient
 from app import db
-from datetime import datetime
+from datetime import datetime, date
 
 bp = Blueprint('patients', __name__, url_prefix='/patients')
 
@@ -17,18 +17,40 @@ def index():
 def new():
     if request.method == 'POST':
         try:
-            # Convert date string to Python date object
-            date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d').date()
+            # Get form data
+            first_name = request.form.get('first_name')
+            last_name = request.form.get('last_name')
+            date_of_birth = datetime.strptime(request.form.get('date_of_birth'), '%Y-%m-%d').date()
+            gender = request.form.get('gender')
+            phone = request.form.get('phone')
+            email = request.form.get('email')
+            address = request.form.get('address')
             
+            # Get medical and treatment information
+            chief_complaint = request.form.get('chief_complaint')
+            medical_dental_history = request.form.get('medical_dental_history')
+            on_examination = request.form.get('on_examination')
+            diagnosis = request.form.get('diagnosis')
+            treatment_plan = request.form.get('treatment_plan')
+            treatment_done = request.form.get('treatment_done')
+            recall = request.form.get('recall')
+            
+            # Create new patient
             patient = Patient(
-                first_name=request.form['first_name'],
-                last_name=request.form['last_name'],
+                first_name=first_name,
+                last_name=last_name,
                 date_of_birth=date_of_birth,
-                gender=request.form['gender'],
-                phone=request.form['phone'],
-                email=request.form['email'],
-                address=request.form['address'],
-                medical_history=request.form['medical_history']
+                gender=gender,
+                phone=phone,
+                email=email,
+                address=address,
+                chief_complaint=chief_complaint,
+                medical_dental_history=medical_dental_history,
+                on_examination=on_examination,
+                diagnosis=diagnosis,
+                treatment_plan=treatment_plan,
+                treatment_done=treatment_done,
+                recall=recall
             )
             db.session.add(patient)
             db.session.commit()
@@ -46,7 +68,8 @@ def new():
 @login_required
 def view(id):
     patient = Patient.query.get_or_404(id)
-    return render_template('patients/view.html', patient=patient)
+    current_date = date.today()
+    return render_template('patients/view.html', patient=patient, now=current_date)
 
 @bp.route('/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -54,17 +77,39 @@ def edit(id):
     patient = Patient.query.get_or_404(id)
     if request.method == 'POST':
         try:
-            # Convert date string to Python date object
-            date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d').date()
+            # Get form data
+            first_name = request.form.get('first_name')
+            last_name = request.form.get('last_name')
+            date_of_birth = datetime.strptime(request.form.get('date_of_birth'), '%Y-%m-%d').date()
+            gender = request.form.get('gender')
+            phone = request.form.get('phone')
+            email = request.form.get('email')
+            address = request.form.get('address')
             
-            patient.first_name = request.form['first_name']
-            patient.last_name = request.form['last_name']
+            # Get medical and treatment information
+            chief_complaint = request.form.get('chief_complaint')
+            medical_dental_history = request.form.get('medical_dental_history')
+            on_examination = request.form.get('on_examination')
+            diagnosis = request.form.get('diagnosis')
+            treatment_plan = request.form.get('treatment_plan')
+            treatment_done = request.form.get('treatment_done')
+            recall = request.form.get('recall')
+            
+            # Update patient
+            patient.first_name = first_name
+            patient.last_name = last_name
             patient.date_of_birth = date_of_birth
-            patient.gender = request.form['gender']
-            patient.phone = request.form['phone']
-            patient.email = request.form['email']
-            patient.address = request.form['address']
-            patient.medical_history = request.form['medical_history']
+            patient.gender = gender
+            patient.phone = phone
+            patient.email = email
+            patient.address = address
+            patient.chief_complaint = chief_complaint
+            patient.medical_dental_history = medical_dental_history
+            patient.on_examination = on_examination
+            patient.diagnosis = diagnosis
+            patient.treatment_plan = treatment_plan
+            patient.treatment_done = treatment_done
+            patient.recall = recall
             
             db.session.commit()
             flash('Patient updated successfully', 'success')

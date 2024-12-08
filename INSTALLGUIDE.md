@@ -1,29 +1,29 @@
 # DentFlow Pro Installation Guide
 
-Welcome to DentFlow Pro - Your Local-First Dental Practice Management Solution! 🦷
+Welcome to DentFlow Pro - Your Local-First Dental Practice Management Solution! 
 
 ## Why DentFlow Pro?
 
 DentFlow Pro is designed with your privacy in mind. Unlike cloud-based solutions:
-- ✨ All data stays on your computer
-- 🔒 No internet connection required
-- 💾 Complete control over your data
-- 🛡️ Enhanced privacy and security
+- All data stays on your computer
+- No internet connection required
+- Complete control over your data
+- Enhanced privacy and security
 
 ## System Requirements
 
 Before installing, ensure your system meets these requirements:
 
 ### Hardware Requirements
-- 💻 Windows 10/11 (64-bit)
-- 🔧 4GB RAM (minimum)
-- 💽 500MB free disk space
-- 🖥️ 1280x720 minimum screen resolution
+- Windows 10/11 (64-bit)
+- 4GB RAM (minimum)
+- 500MB free disk space
+- 1280x720 minimum screen resolution
 
 ### Software Requirements
-- 🐍 Python 3.12 or higher
-- 📦 pip (Python package manager)
-- 🌐 Modern web browser (Chrome, Firefox, or Edge)
+- Python 3.12 or higher
+- pip (Python package manager)
+- Modern web browser (Chrome, Firefox, or Edge)
 
 ## Step-by-Step Installation
 
@@ -31,7 +31,7 @@ Before installing, ensure your system meets these requirements:
 1. Visit [python.org](https://www.python.org/downloads/)
 2. Download Python 3.12 for Windows
 3. Run the installer
-4. **IMPORTANT**: Check ✅ "Add Python to PATH"
+4. **IMPORTANT**: Check "Add Python to PATH"
 5. Click "Install Now"
 6. Verify installation by opening Command Prompt:
    ```cmd
@@ -76,6 +76,10 @@ Before installing, ensure your system meets these requirements:
    FLASK_ENV=development
    SECRET_KEY=your-secure-secret-key
    DATABASE_URL=sqlite:///instance/dentflow.db
+
+   # Email Settings (Gmail)
+   GMAIL_USER=your.clinic@gmail.com
+   GMAIL_APP_PASSWORD=your-app-password-here
    ```
 
 ### 6. Initialize the Database
@@ -99,6 +103,23 @@ Before installing, ensure your system meets these requirements:
    http://localhost:5000
    ```
 3. Log in with your admin credentials
+
+## Email Configuration
+To enable email functionality, you need to:
+1. Have a Gmail account for your clinic
+2. Enable 2-Step Verification in your Google Account:
+   - Go to Google Account Settings
+   - Security → 2-Step Verification → Turn it on
+3. Generate an App Password:
+   - Go to Google Account Settings
+   - Security → App passwords
+   - Select app: Mail
+   - Select device: Other (Custom name)
+   - Enter "DentFlow Pro"
+   - Copy the generated 16-character password
+4. Update your `.env` file with:
+   - `GMAIL_USER`: Your clinic's Gmail address
+   - `GMAIL_APP_PASSWORD`: The 16-character app password
 
 ## First-Time Setup
 
@@ -162,6 +183,24 @@ We recommend regular backups:
    - Ensure write permissions
    - Check disk space
    - Verify SQLite installation
+
+### Email Issues
+1. **Emails not sending:**
+   - Check Gmail credentials in `.env` file
+   - Ensure 2-Step Verification is enabled
+   - Verify App Password is correct
+   - Check patient has valid email address
+
+2. **Gmail security:**
+   - If you get security alerts from Google:
+     1. Go to Google Account → Security
+     2. Verify the login attempt was from your application
+     3. Allow access if prompted
+
+3. **App Password not working:**
+   - Delete existing app password
+   - Generate a new one
+   - Update `.env` file with new password
 
 ### Getting Help
 

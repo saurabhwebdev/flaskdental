@@ -7,9 +7,20 @@ class Patient(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
     gender = db.Column(db.String(10))
-    phone = db.Column(db.String(20), nullable=False)
+    phone = db.Column(db.String(20))
     email = db.Column(db.String(120))
-    address = db.Column(db.String(200))
+    address = db.Column(db.Text)
+    
+    # Medical and Treatment Fields
+    chief_complaint = db.Column(db.Text)
+    medical_dental_history = db.Column(db.Text)
+    on_examination = db.Column(db.Text)
+    diagnosis = db.Column(db.Text)
+    treatment_plan = db.Column(db.Text)
+    treatment_done = db.Column(db.Text)
+    recall = db.Column(db.Text)
+    
+    # Timestamps and other fields
     medical_history = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
