@@ -1,0 +1,156 @@
+/* Print Styles */
+:root {
+    --primary-color: #1a56db;
+    --secondary-color: #4b5563;
+    --border-color: #e5e7eb;
+}
+
+@media print {
+    @page {
+        margin: 2cm;
+        size: A4;
+    }
+
+    body {
+        font-family: 'Arial', sans-serif;
+        line-height: 1.6;
+        color: #000;
+        background: #fff;
+        font-size: 12pt;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .header {
+        text-align: center;
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 1cm;
+        margin-bottom: 1cm;
+    }
+
+    .clinic-name {
+        font-size: 24pt;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin: 0;
+    }
+
+    .clinic-info {
+        font-size: 10pt;
+        color: var(--secondary-color);
+        margin-top: 0.2cm;
+    }
+
+    .section {
+        margin-bottom: 1cm;
+        page-break-inside: avoid;
+    }
+
+    .section-title {
+        font-size: 14pt;
+        font-weight: bold;
+        color: var(--primary-color);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.2cm;
+        margin-bottom: 0.5cm;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5cm;
+    }
+
+    .info-item {
+        margin-bottom: 0.3cm;
+    }
+
+    .info-label {
+        font-weight: bold;
+        color: var(--secondary-color);
+        font-size: 10pt;
+    }
+
+    .info-value {
+        margin-top: 0.1cm;
+        font-size: 11pt;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.5cm 0;
+    }
+
+    th {
+        background-color: #f3f4f6;
+        font-weight: bold;
+        text-align: left;
+        padding: 0.2cm;
+        font-size: 10pt;
+        color: var(--secondary-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+        padding: 0.2cm;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 10pt;
+    }
+
+    .status-badge {
+        padding: 0.1cm 0.3cm;
+        border-radius: 0.2cm;
+        font-size: 9pt;
+        font-weight: bold;
+    }
+
+    .status-scheduled {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-completed {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-cancelled {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .footer {
+        margin-top: 1cm;
+        text-align: center;
+        font-size: 9pt;
+        color: var(--secondary-color);
+        border-top: 1px solid var(--border-color);
+        padding-top: 0.5cm;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .confidential {
+        font-style: italic;
+        margin-top: 0.2cm;
+    }
+
+    /* Ensure good page breaks */
+    h1, h2, h3, h4, h5 {
+        page-break-after: avoid;
+    }
+
+    table, figure {
+        page-break-inside: avoid;
+    }
+
+    /* Hide background colors and ensure black text */
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

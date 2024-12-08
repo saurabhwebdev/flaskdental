@@ -101,7 +101,41 @@ def new():
 def view(id):
     patient = Patient.query.get_or_404(id)
     current_date = date.today()
-    return render_template('patients/view.html', patient=patient, now=current_date)
+    if request.args.get('print') == 'true':
+        return render_template('patients/print.html', 
+                             patient=patient, 
+                             now=current_date,
+                             first_name=patient.first_name,
+                             last_name=patient.last_name,
+                             date_of_birth=patient.date_of_birth,
+                             gender=patient.gender,
+                             phone=patient.phone,
+                             email=patient.email,
+                             address=patient.address,
+                             chief_complaint=patient.chief_complaint,
+                             medical_dental_history=patient.medical_dental_history,
+                             on_examination=patient.on_examination,
+                             diagnosis=patient.diagnosis,
+                             treatment_plan=patient.treatment_plan,
+                             treatment_done=patient.treatment_done,
+                             recall=patient.recall)
+    return render_template('patients/view.html', 
+                         patient=patient, 
+                         now=current_date,
+                         first_name=patient.first_name,
+                         last_name=patient.last_name,
+                         date_of_birth=patient.date_of_birth,
+                         gender=patient.gender,
+                         phone=patient.phone,
+                         email=patient.email,
+                         address=patient.address,
+                         chief_complaint=patient.chief_complaint,
+                         medical_dental_history=patient.medical_dental_history,
+                         on_examination=patient.on_examination,
+                         diagnosis=patient.diagnosis,
+                         treatment_plan=patient.treatment_plan,
+                         treatment_done=patient.treatment_done,
+                         recall=patient.recall)
 
 @bp.route('/<int:id>/edit', methods=['GET', 'POST'])
 @login_required

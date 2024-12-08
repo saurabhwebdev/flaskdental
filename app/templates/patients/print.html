@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details - {{ patient.first_name }} {{ patient.last_name }}</title>
+    <style>
+        @media print {
+            @page {
+                margin: 2cm;
+                size: A4;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #000;
+            background: #fff;
+            margin: 0;
+            padding: 2cm;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #1a56db;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .clinic-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1a56db;
+            margin: 0 0 10px 0;
+        }
+
+        .clinic-info {
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a56db;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #4b5563;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #111827;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #f3f4f6;
+            font-weight: bold;
+            text-align: left;
+            padding: 10px;
+            color: #4b5563;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-scheduled {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 11px;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 20px;
+        }
+
+        .confidential {
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        .print-button, .back-button {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 10px;
+            background-color: #1a56db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .back-button {
+            background-color: #4b5563;
+        }
+
+        /* Ensure good page breaks */
+        h1, h2, h3, h4, h5 {
+            page-break-after: avoid;
+        }
+
+        table, figure {
+            page-break-inside: avoid;
+        }
+
+        /* Print color adjustments */
+        * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Controls -->
+    <div class="no-print">
+        <button onclick="window.print()" class="print-button">Print Document</button>
+        <a href="{{ url_for('patients.view', id=patient.id) }}" class="back-button">Back to Patient</a>
+    </div>
+
+    <!-- Header with Clinic Info -->
+    <div class="header">
+        <h1 class="clinic-name">DentFlow Pro</h1>
+        <div class="clinic-info">
+            <p>Professional Dental Care</p>
+            <p>Your Trusted Dental Practice</p>
+            <p>Created on {{ now.strftime('%B %d, %Y') }}</p>
+        </div>
+    </div>
+
+    <!-- Patient Information -->
+    <div class="section">
+        <h2 class="section-title">Patient Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Patient ID</div>
+                <div class="info-value">{{ patient.id }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Full Name</div>
+                <div class="info-value">{{ patient.first_name }} {{ patient.last_name }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Date of Birth</div>
+                <div class="info-value">
+                    {{ patient.date_of_birth.strftime('%B %d, %Y') }}
+                    ({{ ((now - patient.date_of_birth).days / 365.25) | int }} years)
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Gender</div>
+                <div class="info-value">{{ patient.gender | title }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Contact Number</div>
+                <div class="info-value">{{ patient.phone or 'Not provided' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value">{{ patient.email or 'Not provided' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Address</div>
+                <div class="info-value">{{ patient.address or 'Not provided' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medical History -->
+    <div class="section">
+        <h2 class="section-title">Medical History</h2>
+        <div class="info-item">
+            <div class="info-label">Medical History</div>
+            <div class="info-value">{{ patient.medical_history or 'No medical history recorded' }}</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">Medical/Dental History</div>
+            <div class="info-value">{{ patient.medical_dental_history or 'No medical/dental history recorded' }}</div>
+        </div>
+    </div>
+
+    <!-- Treatment Information -->
+    <div class="section">
+        <h2 class="section-title">Treatment Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Chief Complaint</div>
+                <div class="info-value">{{ patient.chief_complaint or 'Not recorded' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Diagnosis</div>
+                <div class="info-value">{{ patient.diagnosis or 'Not recorded' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Treatment Plan</div>
+                <div class="info-value">{{ patient.treatment_plan or 'Not recorded' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Treatment Done</div>
+                <div class="info-value">{{ patient.treatment_done or 'Not recorded' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Appointments -->
+    <div class="section">
+        <h2 class="section-title">Recent Appointments</h2>
+        {% if patient.appointments %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Treatment</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in patient.appointments[-5:] %}
+                <tr>
+                    <td>{{ appointment.date.strftime('%B %d, %Y') }}</td>
+                    <td>{{ appointment.time.strftime('%I:%M %p') }}</td>
+                    <td>{{ appointment.treatment_type }}</td>
+                    <td>
+                        <span class="status-badge status-{{ appointment.status }}">
+                            {{ appointment.status | title }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No appointments recorded</p>
+        {% endif %}
+    </div>
+
+    <!-- Recent Prescriptions -->
+    <div class="section">
+        <h2 class="section-title">Recent Prescriptions</h2>
+        {% if patient.prescriptions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Diagnosis</th>
+                    <th>Medications</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prescription in patient.prescriptions[-5:] %}
+                <tr>
+                    <td>{{ prescription.date.strftime('%B %d, %Y') }}</td>
+                    <td>{{ prescription.diagnosis }}</td>
+                    <td>
+                        {% for medication in prescription.medications %}
+                        <div>{{ medication.name }} - {{ medication.dosage }}</div>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No prescriptions recorded</p>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Printed on {{ now.strftime('%B %d, %Y') }}</p>
+        <p class="confidential">This is a confidential medical record. Please handle with care.</p>
+    </div>
+</body>
+</html>
