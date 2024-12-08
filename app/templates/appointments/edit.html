@@ -27,8 +27,8 @@
                     </div>
 
                     <div>
-                        <label for="appointment_type" class="form-label">Appointment Type</label>
-                        <select name="appointment_type" id="appointment_type" required class="form-select">
+                        <label for="treatment_type" class="form-label">Appointment Type</label>
+                        <select name="treatment_type" id="treatment_type" required class="form-select">
                             <option value="checkup" {% if appointment.treatment_type == 'checkup' %}selected{% endif %}>Check-up</option>
                             <option value="cleaning" {% if appointment.treatment_type == 'cleaning' %}selected{% endif %}>Cleaning</option>
                             <option value="filling" {% if appointment.treatment_type == 'filling' %}selected{% endif %}>Filling</option>
@@ -48,6 +48,18 @@
                         <label for="time" class="form-label">Time</label>
                         <input type="time" name="time" id="time" required class="form-input"
                                value="{{ appointment.time.strftime('%H:%M') }}">
+                    </div>
+
+                    <div>
+                        <label for="duration" class="form-label">Duration (minutes)</label>
+                        <select name="duration" id="duration" required class="form-select">
+                            <option value="15" {% if appointment.duration == 15 %}selected{% endif %}>15 minutes</option>
+                            <option value="30" {% if appointment.duration == 30 %}selected{% endif %}>30 minutes</option>
+                            <option value="45" {% if appointment.duration == 45 %}selected{% endif %}>45 minutes</option>
+                            <option value="60" {% if appointment.duration == 60 %}selected{% endif %}>1 hour</option>
+                            <option value="90" {% if appointment.duration == 90 %}selected{% endif %}>1.5 hours</option>
+                            <option value="120" {% if appointment.duration == 120 %}selected{% endif %}>2 hours</option>
+                        </select>
                     </div>
 
                     <div>

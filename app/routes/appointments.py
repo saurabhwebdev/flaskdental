@@ -142,13 +142,17 @@ def edit(id):
             appointment.time = datetime.strptime(request.form['time'], '%H:%M').time()
             appointment.treatment_type = request.form['treatment_type']
             appointment.duration = int(request.form['duration'])
+            appointment.status = request.form['status']
             appointment.notes = request.form.get('notes', '')
+            
             db.session.commit()
             flash('Appointment updated successfully', 'success')
             return redirect(url_for('appointments.index'))
-        except ValueError:
+        except ValueError as e:
+            logger.error(f"Value error in edit appointment: {str(e)}")
             flash('Invalid date or time format', 'error')
         except Exception as e:
+            logger.error(f"Error editing appointment: {str(e)}")
             flash(f'An error occurred: {str(e)}', 'error')
     
     patients = Patient.query.order_by(Patient.last_name).all()
