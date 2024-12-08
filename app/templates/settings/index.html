@@ -22,35 +22,62 @@
                             </div>
 
                             <div>
-                                <label for="phone" class="form-label">Phone Number</label>
-                                <input type="tel" name="phone" id="phone" value="{{ settings.phone if settings else '' }}" required class="form-input">
+                                <label for="clinic_phone" class="form-label">Phone Number</label>
+                                <input type="tel" name="clinic_phone" id="clinic_phone" value="{{ settings.clinic_phone if settings else '' }}" required class="form-input">
                             </div>
 
                             <div>
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" name="email" id="email" value="{{ settings.email if settings else '' }}" required class="form-input">
+                                <label for="clinic_email" class="form-label">Email</label>
+                                <input type="email" name="clinic_email" id="clinic_email" value="{{ settings.clinic_email if settings else '' }}" required class="form-input">
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label for="address" class="form-label">Address</label>
-                                <textarea name="address" id="address" rows="3" required class="form-textarea">{{ settings.address if settings else '' }}</textarea>
+                                <label for="clinic_address" class="form-label">Address</label>
+                                <textarea name="clinic_address" id="clinic_address" rows="3" required class="form-textarea">{{ settings.clinic_address if settings else '' }}</textarea>
                             </div>
                         </div>
                     </div>
 
                     <!-- Business Hours -->
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Business Hours</h3>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Business Hours</h3>
+                            <button type="button" 
+                                    onclick="copyMondayHours()"
+                                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Copy Monday Hours to All Days
+                            </button>
+                        </div>
                         <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                             {% for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
-                            <div class="flex items-center space-x-4">
-                                <div class="w-24">
-                                    <span class="form-label capitalize">{{ day }}</span>
+                            <div class="flex items-center space-x-4 sm:col-span-2">
+                                <div class="w-1/4">
+                                    <label class="form-label capitalize">{{ day }}</label>
                                 </div>
-                                <div class="flex-1 flex space-x-2">
-                                    <input type="time" name="{{ day }}_start" value="{{ settings[day + '_start'] if settings else '09:00' }}" class="form-input">
-                                    <span class="text-gray-500 self-center">to</span>
-                                    <input type="time" name="{{ day }}_end" value="{{ settings[day + '_end'] if settings else '17:00' }}" class="form-input">
+                                <div class="w-1/4">
+                                    <input type="time" 
+                                           name="hours_{{ day }}_start" 
+                                           id="hours_{{ day }}_start"
+                                           value="{{ settings['hours_' + day + '_start'] if settings else '10:00' }}"
+                                           class="form-input" 
+                                           {% if settings['hours_' + day + '_closed'] %}disabled{% endif %}>
+                                </div>
+                                <div class="w-1/4">
+                                    <input type="time" 
+                                           name="hours_{{ day }}_end"
+                                           id="hours_{{ day }}_end"
+                                           value="{{ settings['hours_' + day + '_end'] if settings else '20:00' }}"
+                                           class="form-input"
+                                           {% if settings['hours_' + day + '_closed'] %}disabled{% endif %}>
+                                </div>
+                                <div class="w-1/4 flex items-center">
+                                    <input type="checkbox" 
+                                           name="hours_{{ day }}_closed" 
+                                           id="hours_{{ day }}_closed"
+                                           onchange="toggleTimeInputs('{{ day }}')"
+                                           {% if settings['hours_' + day + '_closed'] %}checked{% endif %}
+                                           class="form-checkbox h-4 w-4 text-blue-600">
+                                    <label for="hours_{{ day }}_closed" class="ml-2 text-sm text-gray-700">Closed</label>
                                 </div>
                             </div>
                             {% endfor %}
@@ -120,4 +147,32 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyMondayHours() {
+    const mondayStart = document.getElementById('hours_monday_start').value;
+    const mondayEnd = document.getElementById('hours_monday_end').value;
+    const days = ['tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    
+    days.forEach(day => {
+        const startInput = document.getElementById(`hours_${day}_start`);
+        const endInput = document.getElementById(`hours_${day}_end`);
+        if (!document.getElementById(`hours_${day}_closed`).checked) {
+            startInput.value = mondayStart;
+            endInput.value = mondayEnd;
+        }
+    });
+}
+
+function toggleTimeInputs(day) {
+    const startInput = document.getElementById(`hours_${day}_start`);
+    const endInput = document.getElementById(`hours_${day}_end`);
+    const closedCheckbox = document.getElementById(`hours_${day}_closed`);
+    
+    startInput.disabled = closedCheckbox.checked;
+    endInput.disabled = closedCheckbox.checked;
+}
+</script>
 {% endblock %}
