@@ -11,7 +11,7 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3b82f6',
+                        primary: '#FF7F11',
                     }
                 }
             }
@@ -41,7 +41,7 @@
                 @apply px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2;
             }
             .btn-primary {
-                @apply bg-primary text-white hover:bg-blue-700 focus:ring-blue-500;
+                @apply bg-primary text-white hover:bg-orange-700 focus:ring-orange-500;
             }
             .btn-secondary {
                 @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-primary;
@@ -62,22 +62,25 @@
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
                         <a href="{{ url_for('main.dashboard') }}" class="inline-flex items-center">
-                            <span class="text-2xl font-bold text-blue-500">DentFlow</span>
-                            <span class="text-lg font-semibold text-gray-600 ml-1">Pro</span>
+                            <span class="text-2xl font-bold text-gray-900">DentFlow</span>
+                            <span class="text-2xl font-bold text-[#FF7F11]">Pro</span>
                         </a>
                     </div>
                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="{{ url_for('patients.index') }}" class="border-transparent text-gray-500 hover:border-primary hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        <a href="{{ url_for('patients.index') }}" class="border-transparent text-gray-500 hover:border-[#FF7F11] hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             Patients
                         </a>
-                        <a href="{{ url_for('appointments.index') }}" class="border-transparent text-gray-500 hover:border-primary hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        <a href="{{ url_for('appointments.index') }}" class="border-transparent text-gray-500 hover:border-[#FF7F11] hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             Appointments
                         </a>
-                        <a href="{{ url_for('prescriptions.index') }}" class="border-transparent text-gray-500 hover:border-primary hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        <a href="{{ url_for('prescriptions.index') }}" class="border-transparent text-gray-500 hover:border-[#FF7F11] hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             Prescriptions
                         </a>
-                        <a href="{{ url_for('invoices.index') }}" class="border-transparent text-gray-500 hover:border-primary hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        <a href="{{ url_for('invoices.index') }}" class="border-transparent text-gray-500 hover:border-[#FF7F11] hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             Invoices
+                        </a>
+                        <a href="{{ url_for('reports.generate_report') }}" class="border-transparent text-gray-500 hover:border-[#FF7F11] hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            <i class="fas fa-file-pdf mr-1"></i> Report
                         </a>
                     </div>
                 </div>

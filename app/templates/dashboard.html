@@ -50,7 +50,7 @@
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <i class="fas fa-calendar-check text-2xl text-blue-600"></i>
+                        <i class="fas fa-calendar-check text-2xl text-[#FF7F11]"></i>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
@@ -68,7 +68,7 @@
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <i class="fas fa-calendar-alt text-2xl text-indigo-600"></i>
+                        <i class="fas fa-calendar-alt text-2xl text-[#FF7F11]"></i>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
@@ -87,7 +87,7 @@
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <i class="fas fa-file-invoice text-2xl text-indigo-600"></i>
+                        <i class="fas fa-file-invoice text-2xl text-[#FF7F11]"></i>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
@@ -160,7 +160,7 @@
     <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
             <h2 class="text-lg leading-6 font-medium text-gray-900">Upcoming Appointments</h2>
-            <a href="{{ url_for('appointments.new') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+            <a href="{{ url_for('appointments.new') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-[#FF7F11] hover:bg-[#FF7F11]/80">
                 <i class="fas fa-plus mr-2"></i> New Appointment
             </a>
         </div>
@@ -175,7 +175,7 @@
                                 <i class="fas fa-user-circle text-2xl text-gray-400"></i>
                             </div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-indigo-600">
+                                <div class="text-sm font-medium text-[#FF7F11]">
                                     {{ appointment.patient.full_name }}
                                 </div>
                                 <div class="text-sm text-gray-500">
@@ -207,7 +207,7 @@
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
             <h2 class="text-lg leading-6 font-medium text-gray-900">Recent Patients</h2>
-            <a href="{{ url_for('patients.new') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+            <a href="{{ url_for('patients.new') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-[#FF7F11] hover:bg-[#FF7F11]/80">
                 <i class="fas fa-plus mr-2"></i> New Patient
             </a>
         </div>
@@ -222,7 +222,7 @@
                                 <i class="fas fa-user-circle text-2xl text-gray-400"></i>
                             </div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-indigo-600">
+                                <div class="text-sm font-medium text-[#FF7F11]">
                                     {{ patient.full_name }}
                                 </div>
                                 <div class="text-sm text-gray-500">
@@ -231,7 +231,7 @@
                             </div>
                         </div>
                         <div>
-                            <a href="{{ url_for('patients.view', id=patient.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                            <a href="{{ url_for('patients.view', id=patient.id) }}" class="text-[#FF7F11] hover:text-[#FF7F11]/80">View</a>
                         </div>
                     </div>
                 </li>

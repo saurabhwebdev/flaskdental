@@ -46,16 +46,17 @@ def create_app():
         from app.models.appointment import Appointment
         
         # Import routes
-        from app.routes import auth, patients, appointments, prescriptions, invoices, settings, main
+        from app.routes import auth, patients, appointments, prescriptions, invoices, settings, main, reports
         
         # Register blueprints
-        app.register_blueprint(main.bp)
         app.register_blueprint(auth.bp)
         app.register_blueprint(patients.bp)
         app.register_blueprint(appointments.bp)
         app.register_blueprint(prescriptions.prescriptions)
         app.register_blueprint(invoices.invoices)
         app.register_blueprint(settings.settings)
+        app.register_blueprint(main.bp)
+        app.register_blueprint(reports.reports)
 
         # Register template helpers
         from app.utils.template_helpers import update_url_query
